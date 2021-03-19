@@ -4,9 +4,9 @@
 
 LAMPS                                                       M. Ounsworth
 Internet-Draft                                                   Entrust
-Updates: {"RFC5280"=>nil} (if approved)          Markku-Juhani. Saarinen
-Intended status: Standards Track                          March 18, 2021
-Expires: September 19, 2021
+Updates: {"RFC5280"=>nil} (if approved)                      M. Saarinen
+Intended status: Standards Track                                PQShield
+Expires: September 19, 2021                               March 18, 2021
 
 
           External Keys And Signatures For Use In Internet PKI
@@ -16,9 +16,10 @@ Abstract
 
    Many of the post quantum cryptographic algorithms have either large
    public keys or signatures.  In the interest of reducing bandwidth of
-   transitting X.509 certificates, this document provides a mechanism
-   for referencing external public key and signature data by hash, URL,
-   etc.
+   transitting X.509 certificates, this document defines new public key
+   and signature algorithms for referencing external public key and
+   signature data by hash, URL, etc.  This mechanism is designed to
+   mimic the behaviour of an Authority Information Access extension.
 
 Status of This Memo
 
@@ -52,7 +53,6 @@ Copyright Notice
 
 
 
-
 Ounsworth & Saarinen   Expires September 19, 2021               [Page 1]
 
 Internet-Draft           External keys and sigs               March 2021
@@ -64,47 +64,47 @@ Internet-Draft           External keys and sigs               March 2021
 Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
-   2.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   2
-   3.  Security Considerations . . . . . . . . . . . . . . . . . . .   2
-   4.  Appendices  . . . . . . . . . . . . . . . . . . . . . . . . .   2
-     4.1.  ASN.1 Module  . . . . . . . . . . . . . . . . . . . . . .   2
-     4.2.  Intellectual Property Considerations  . . . . . . . . . .   2
-   5.  Contributors and Acknowledgements . . . . . . . . . . . . . .   2
-     5.1.  Making contributions  . . . . . . . . . . . . . . . . . .   3
-   6.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   3
-     6.1.  Normative References  . . . . . . . . . . . . . . . . . .   3
-     6.2.  Informative References  . . . . . . . . . . . . . . . . .   3
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   3
+   2.  External Value  . . . . . . . . . . . . . . . . . . . . . . .   2
+     2.1.  External Public Key . . . . . . . . . . . . . . . . . . .   2
+     2.2.  External Signature  . . . . . . . . . . . . . . . . . . .   3
+   3.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   3
+   4.  Security Considerations . . . . . . . . . . . . . . . . . . .   3
+     4.1.  CSRs and CT logs  . . . . . . . . . . . . . . . . . . . .   3
+   5.  Appendices  . . . . . . . . . . . . . . . . . . . . . . . . .   3
+     5.1.  ASN.1 Module  . . . . . . . . . . . . . . . . . . . . . .   4
+     5.2.  Intellectual Property Considerations  . . . . . . . . . .   4
+   6.  Contributors and Acknowledgements . . . . . . . . . . . . . .   4
+     6.1.  Making contributions  . . . . . . . . . . . . . . . . . .   4
+   7.  Normative References  . . . . . . . . . . . . . . . . . . . .   4
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .   5
 
 1.  Introduction
 
-2.  IANA Considerations
+2.  External Value
 
-   The ASN.1 module OID is TBD.  The id-alg-composite OID is to be
-   assigned by IANA.
+   The id-external-value algorithm identifier is used for identifying a
+   public key or signature which is provided as a reference to external
+   data.
 
-3.  Security Considerations
+   id-external-value ::= < OID >
 
-4.  Appendices
+   The corresponding subjectPublicKey is the DER encoding of the
+   following structure:
 
-4.1.  ASN.1 Module
+   ExternalValue ::= SEQUENCE {
+     location     GeneralName,
+     hashAlg      AlgorithmIdentifier,
+     hashVal      BIT STRING
+   }
 
-4.2.  Intellectual Property Considerations
+   Upon retrieval of the referenced data, the hash of the OCTET STRING
+   of the retrieved data (removing base64 encoding if necessary) MUST be
+   verified using hashAlg to match the ExternalPublicKey.hash value.
 
-   The following IPR Disclosure relates to this draft:
+2.1.  External Public Key
 
-   https://datatracker.ietf.org/ipr/3588/
-
-5.  Contributors and Acknowledgements
-
-   This document incorporates contributions and comments from a large
-   group of experts.  The Editors would especially like to acknowledge
-   the expertise and tireless dedication of the following people, who
-   attended many long meetings and generated millions of bytes of
-   electronic mail and VOIP traffic over the past year in pursuit of
-   this document:
-
-
+   When used with a public key, algorithm parameters for id-external-
+   value are absent.
 
 
 
@@ -113,6 +113,79 @@ Ounsworth & Saarinen   Expires September 19, 2021               [Page 2]
 
 Internet-Draft           External keys and sigs               March 2021
 
+
+   When ExternalValue is placed into a
+   SubjectPublicKeyInfo.subjectPublicKey, the ExternalValue.location
+   MUST refer to a DER-encoded SubjectPublicKeyInfo, which MAY be base64
+   encoded for easier transport over text protocols.
+
+2.2.  External Signature
+
+   When used with a signatureAlgorithm, algorithm parameters are to
+   contain the AlgorithmIdentifier of the signature that is being
+   externalized.
+
+   When ExternalValue is placed into a signatureValue, the location MUST
+   refer to the BIT STRING of a signatureValue, which MAY be base64
+   encoded for easier transport over text protocols.
+
+3.  IANA Considerations
+
+   The ASN.1 module OID is TBD.  The id-alg-composite OID is to be
+   assigned by IANA.
+
+4.  Security Considerations
+
+4.1.  CSRs and CT logs
+
+   In practice, situations will arise where the
+   ExternalPublicKey.location refers to a location which is not publicly
+   available either because it is in a local keystore, on a private
+   network, or no longer being hosted.
+
+   Not having the public key in a certificate signing request (CSR)
+   could make it substantially harder for CAs to perform vetting of the
+   key, for example for cryptographic strength or checking for prior
+   revocation due to key compromise.  A certificate requester MUST make
+   the full public key available to the CA at the time of certificate
+   request either by ensuring that the link in the
+   ExternalPublicKey.location is visible to the CA, or by supplying the
+   full public key to the CA out of band.
+
+   Not having the public key in Certificate Transparency (CT) logs could
+   make it substantially harder for researchers to perform auditing
+   tasks on CT logs.  This may require additional CT mechanisms.
+
+5.  Appendices
+
+
+
+
+
+
+
+
+Ounsworth & Saarinen   Expires September 19, 2021               [Page 3]
+
+Internet-Draft           External keys and sigs               March 2021
+
+
+5.1.  ASN.1 Module
+
+5.2.  Intellectual Property Considerations
+
+   The following IPR Disclosure relates to this draft:
+
+   https://datatracker.ietf.org/ipr/3588/
+
+6.  Contributors and Acknowledgements
+
+   This document incorporates contributions and comments from a large
+   group of experts.  The Editors would especially like to acknowledge
+   the expertise and tireless dedication of the following people, who
+   attended many long meetings and generated millions of bytes of
+   electronic mail and VOIP traffic over the past year in pursuit of
+   this document:
 
    John Gray (Entrust), Serge Mister (Entrust), Scott Fluhrer (Cisco
    Systems), Panos Kampanakis (Cisco Systems), Daniel Van Geest (ISARA),
@@ -126,7 +199,7 @@ Internet-Draft           External keys and sigs               March 2021
    "Copying always makes things easier and less error prone" -
    [RFC8411].
 
-5.1.  Making contributions
+6.1.  Making contributions
 
    Additional contributions to this draft are weclome.  Please see the
    working copy of this draft at, as well as open issues at:
@@ -134,9 +207,7 @@ Internet-Draft           External keys and sigs               March 2021
    https://github.com/EntrustCorporation/draft-ounsworth-pq-external-
    keys
 
-6.  References
-
-6.1.  Normative References
+7.  Normative References
 
    [RFC5280]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
               Housley, R., and W. Polk, "Internet X.509 Public Key
@@ -144,12 +215,21 @@ Internet-Draft           External keys and sigs               March 2021
               (CRL) Profile", RFC 5280, DOI 10.17487/RFC5280, May 2008,
               <https://www.rfc-editor.org/info/rfc5280>.
 
-6.2.  Informative References
 
-   [I-D.pala-composite-crypto]
-              Pala, M., "Composite Public Keys and Signatures", draft-
-              pala-composite-crypto-00 (work in progress), February
-              2019.
+
+
+
+
+
+Ounsworth & Saarinen   Expires September 19, 2021               [Page 4]
+
+Internet-Draft           External keys and sigs               March 2021
+
+
+   [RFC8411]  Schaad, J. and R. Andrews, "IANA Registration for the
+              Cryptographic Algorithm Object Identifier Range",
+              RFC 8411, DOI 10.17487/RFC8411, August 2018,
+              <https://www.rfc-editor.org/info/rfc8411>.
 
 Authors' Addresses
 
@@ -162,13 +242,8 @@ Authors' Addresses
    Email: mike.ounsworth@entrust.com
 
 
-
-
-
-Ounsworth & Saarinen   Expires September 19, 2021               [Page 3]
-
-Internet-Draft           External keys and sigs               March 2021
-
+   Markku-Juhani O. Saarinen
+   PQShield
 
    Email: mjos@pqshield.com
 
@@ -202,23 +277,4 @@ Internet-Draft           External keys and sigs               March 2021
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Ounsworth & Saarinen   Expires September 19, 2021               [Page 4]
+Ounsworth & Saarinen   Expires September 19, 2021               [Page 5]
