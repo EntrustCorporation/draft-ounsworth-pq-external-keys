@@ -6,7 +6,7 @@ LAMPS                                                       M. Ounsworth
 Internet-Draft                                                   Entrust
 Updates: {"RFC5280"=>nil} (if approved)                      M. Saarinen
 Intended status: Standards Track                                PQShield
-Expires: September 19, 2021                               March 18, 2021
+Expires: September 22, 2021                               March 21, 2021
 
 
           External Keys And Signatures For Use In Internet PKI
@@ -36,7 +36,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on September 19, 2021.
+   This Internet-Draft will expire on September 22, 2021.
 
 Copyright Notice
 
@@ -53,7 +53,7 @@ Copyright Notice
 
 
 
-Ounsworth & Saarinen   Expires September 19, 2021               [Page 1]
+Ounsworth & Saarinen   Expires September 22, 2021               [Page 1]
 
 Internet-Draft           External keys and sigs               March 2021
 
@@ -65,12 +65,12 @@ Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   2
    2.  External Value  . . . . . . . . . . . . . . . . . . . . . . .   2
-     2.1.  External Public Key . . . . . . . . . . . . . . . . . . .   2
+     2.1.  External Public Key . . . . . . . . . . . . . . . . . . .   3
      2.2.  External Signature  . . . . . . . . . . . . . . . . . . .   3
    3.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   3
    4.  Security Considerations . . . . . . . . . . . . . . . . . . .   3
      4.1.  CSRs and CT logs  . . . . . . . . . . . . . . . . . . . .   3
-   5.  Appendices  . . . . . . . . . . . . . . . . . . . . . . . . .   3
+   5.  Appendices  . . . . . . . . . . . . . . . . . . . . . . . . .   4
      5.1.  ASN.1 Module  . . . . . . . . . . . . . . . . . . . . . .   4
      5.2.  Intellectual Property Considerations  . . . . . . . . . .   4
    6.  Contributors and Acknowledgements . . . . . . . . . . . . . .   4
@@ -98,26 +98,31 @@ Table of Contents
    }
 
    Upon retrieval of the referenced data, the hash of the OCTET STRING
-   of the retrieved data (removing base64 encoding if necessary) MUST be
-   verified using hashAlg to match the ExternalPublicKey.hash value.
+   of the retrieved data (removing base64 encoding as per [RFC4648] if
+   necessary) MUST be verified using hashAlg to match the
+   ExternalPublicKey.hash value.
+
+
+
+
+
+
+
+
+Ounsworth & Saarinen   Expires September 22, 2021               [Page 2]
+
+Internet-Draft           External keys and sigs               March 2021
+
 
 2.1.  External Public Key
 
    When used with a public key, algorithm parameters for id-external-
    value are absent.
 
-
-
-
-Ounsworth & Saarinen   Expires September 19, 2021               [Page 2]
-
-Internet-Draft           External keys and sigs               March 2021
-
-
    When ExternalValue is placed into a
    SubjectPublicKeyInfo.subjectPublicKey, the ExternalValue.location
    MUST refer to a DER-encoded SubjectPublicKeyInfo, which MAY be base64
-   encoded for easier transport over text protocols.
+   encoded as per [RFC4648] for easier transport over text protocols.
 
 2.2.  External Signature
 
@@ -127,7 +132,7 @@ Internet-Draft           External keys and sigs               March 2021
 
    When ExternalValue is placed into a signatureValue, the location MUST
    refer to the BIT STRING of a signatureValue, which MAY be base64
-   encoded for easier transport over text protocols.
+   encoded as per [RFC4648] for easier transport over text protocols.
 
 3.  IANA Considerations
 
@@ -156,19 +161,16 @@ Internet-Draft           External keys and sigs               March 2021
    make it substantially harder for researchers to perform auditing
    tasks on CT logs.  This may require additional CT mechanisms.
 
-5.  Appendices
 
 
 
 
-
-
-
-
-Ounsworth & Saarinen   Expires September 19, 2021               [Page 3]
+Ounsworth & Saarinen   Expires September 22, 2021               [Page 3]
 
 Internet-Draft           External keys and sigs               March 2021
 
+
+5.  Appendices
 
 5.1.  ASN.1 Module
 
@@ -209,22 +211,26 @@ Internet-Draft           External keys and sigs               March 2021
 
 7.  Normative References
 
+   [RFC4648]  Josefsson, S., "The Base16, Base32, and Base64 Data
+              Encodings", RFC 4648, DOI 10.17487/RFC4648, October 2006,
+              <https://www.rfc-editor.org/info/rfc4648>.
+
+
+
+
+
+
+
+Ounsworth & Saarinen   Expires September 22, 2021               [Page 4]
+
+Internet-Draft           External keys and sigs               March 2021
+
+
    [RFC5280]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,
               Housley, R., and W. Polk, "Internet X.509 Public Key
               Infrastructure Certificate and Certificate Revocation List
               (CRL) Profile", RFC 5280, DOI 10.17487/RFC5280, May 2008,
               <https://www.rfc-editor.org/info/rfc5280>.
-
-
-
-
-
-
-
-Ounsworth & Saarinen   Expires September 19, 2021               [Page 4]
-
-Internet-Draft           External keys and sigs               March 2021
-
 
    [RFC8411]  Schaad, J. and R. Andrews, "IANA Registration for the
               Cryptographic Algorithm Object Identifier Range",
@@ -271,10 +277,4 @@ Authors' Addresses
 
 
 
-
-
-
-
-
-
-Ounsworth & Saarinen   Expires September 19, 2021               [Page 5]
+Ounsworth & Saarinen   Expires September 22, 2021               [Page 5]

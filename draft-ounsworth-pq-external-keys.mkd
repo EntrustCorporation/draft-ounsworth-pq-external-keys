@@ -37,6 +37,7 @@ author:
       email: mjos@pqshield.com
 
 normative:
+  RFC4648:
   RFC5280:
   RFC8411:
 
@@ -77,19 +78,19 @@ ExternalValue ::= SEQUENCE {
 ~~~
 
 
-Upon retrieval of the referenced data, the hash of the OCTET STRING of the retrieved data (removing base64 encoding if necessary) MUST be verified using hashAlg to match the ExternalPublicKey.hash value.
+Upon retrieval of the referenced data, the hash of the OCTET STRING of the retrieved data (removing base64 encoding as per [RFC4648] if necessary) MUST be verified using hashAlg to match the ExternalPublicKey.hash value.
 
 ## External Public Key
 
 When used with a public key, algorithm parameters for id-external-value are absent.
 
-When ExternalValue is placed into a SubjectPublicKeyInfo.subjectPublicKey, the ExternalValue.location MUST refer to a DER-encoded SubjectPublicKeyInfo, which MAY be base64 encoded for easier transport over text protocols.
+When ExternalValue is placed into a SubjectPublicKeyInfo.subjectPublicKey, the ExternalValue.location MUST refer to a DER-encoded SubjectPublicKeyInfo, which MAY be base64 encoded as per [RFC4648] for easier transport over text protocols.
 
 ## External Signature
 
 When used with a signatureAlgorithm, algorithm parameters are to contain the AlgorithmIdentifier of the signature that is being externalized.
 
-When ExternalValue is placed into a signatureValue, the location MUST refer to the BIT STRING of a signatureValue, which MAY be base64 encoded for easier transport over text protocols.
+When ExternalValue is placed into a signatureValue, the location MUST refer to the BIT STRING of a signatureValue, which MAY be base64 encoded as per [RFC4648] for easier transport over text protocols.
 
 
 
